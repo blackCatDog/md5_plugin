@@ -15,9 +15,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import android.util.Base64;
 import android.util.Log;
+import androidx.annotation.NonNull;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+
 
 /** Md5Plugin */
-public class Md5Plugin implements MethodCallHandler {
+public class Md5Plugin implements MethodCallHandler,FlutterPlugin {
   /** Plugin registration. *//*
   public static void registerWith(Registrar registrar) {
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "md5_plugin");
@@ -35,8 +38,38 @@ public class Md5Plugin implements MethodCallHandler {
 
   private final int BUFFER_SIZE = 1024 * 8;
 
+//  companion object {
+//    @JvmStatic
+//    fun registerWith(registrar: Registrar) {
+//      val instance: com.example.fluttershare.FlutterSharePlugin = com.example.fluttershare.FlutterSharePlugin()
+//      instance.onAttachedToEngine(registrar.context(), registrar.messenger())
+////            val channel = MethodChannel(registrar.messenger(), "flutter_share")
+////            channel.setMethodCallHandler(FlutterSharePlugin(registrar))
+//    }
+//  }
+
+  @Override
+  public void  onAttachedToEngine(FlutterPluginBinding binding) {
+    onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
+  }
+
+  private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger) {
+    context = applicationContext;
+    methodChannel = new MethodChannel(messenger, "md5_plugin");
+    methodChannel.setMethodCallHandler(this);
+  }
+
+  @Override
+  public void onDetachedFromEngine(FlutterPluginBinding binding) {
+    context = null;
+    methodChannel.setMethodCallHandler(null);
+    methodChannel = null;
+  }
+
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
+    com.example.fluttershare.FlutterSharePlugin instance = new com.example.fluttershare.FlutterSharePlugin();
+    instance.onAttachedToEngine(registrar.context(), registrar.messenger());
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "md5_plugin");
     channel.setMethodCallHandler(new Md5Plugin());
   }
